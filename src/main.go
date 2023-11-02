@@ -6,9 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"soupdevsolutions/healthchecker/domain"
+
+	"soupdevsolutions/healthchecker/checker"
 )
 
+var healthchecker checker.Checker = checker.Checker{
+	SecondBetweenRuns: 5,
+	Targets: []domain.HealthcheckTarget{
+		{
+			Uri:          "http://www.google.com",
+			Name:         "Google",
+			Healthchecks: []domain.Healthcheck{},
+		},
+		{
+			Uri:          "http://www.yahoo.com",
+			Name:         "Yahoo",
+			Healthchecks: []domain.Healthcheck{},
+		},
+	},
+}
+
 func main() {
+
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -17,27 +36,11 @@ func main() {
 	})
 	router.GET("/healthchecks", getHealthchecks)
 
+	go healthchecker.Check()
 	router.Run("127.0.0.1:8080")
 }
 
 func getHealthchecks(c *gin.Context) {
-	healthchecks := []domain.Healthcheck{
-		{
-			Uri:    "google.com",
-			Name:   "Google",
-			Status: "OK",
-		},
-		{
-			Uri:    "facebook.com",
-			Name:   "Facebook",
-			Status: "OK",
-		},
-		{
-			Uri:    "twitter.com",
-			Name:   "Twitter",
-			Status: "OK",
-		},
-	}
 
-	c.JSON(http.StatusOK, healthchecks)
+	c.JSON(http.StatusOK, gin.H{"targets": healthchecker.Targets})
 }

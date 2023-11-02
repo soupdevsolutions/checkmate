@@ -1,7 +1,12 @@
 package domain
 
+type HealthcheckTarget struct {
+	Uri          string        `json:"uri"`
+	Name         string        `json:"name"`
+	Healthchecks []Healthcheck `json:"healthchecks"`
+}
+
 type Healthcheck struct {
-	Uri    string `json:"uri"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	StatusCode int   `json:"statusCode"`
+	Timestamp  int64 `json:"timestamp"`
 }
