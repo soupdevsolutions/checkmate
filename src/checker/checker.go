@@ -1,20 +1,36 @@
 package checker
 
 import (
-	"fmt"
+	"log"
 	"soupdevsolutions/healthchecker/domain"
 	"time"
 )
 
 type Checker struct {
-	Targets           []domain.HealthcheckTarget
-	SecondBetweenRuns int
+	Targets            []domain.HealthcheckTarget
+	SecondsBetweenRuns int
+	running            bool
 }
 
-func (c *Checker) Check() {
-	for {
+func (c *Checker) Start() {
+	c.running = true
+	go c.Run()
+}
+
+func (c *Checker) Stop() {
+	c.running = false
+}
+
+func (c *Checker) IsRunning() bool {
+	return c.running
+}
+
+func (c *Checker) Run() {
+	for c.running {
+		time.Sleep(time.Duration(c.SecondsBetweenRuns) * time.Second)
+
 		for i, target := range c.Targets {
-			fmt.Println("Checking target: ", target.Name)
+			log.Println("Checking target: ", target.Name)
 
 			result := domain.Healthcheck{
 				StatusCode: 200,
@@ -22,10 +38,7 @@ func (c *Checker) Check() {
 			}
 
 			c.Targets[i].Healthchecks = append(c.Targets[i].Healthchecks, result)
-
-			fmt.Println("Target: ", len(c.Targets[i].Healthchecks))
 		}
 
-		time.Sleep(time.Duration(c.SecondBetweenRuns) * time.Second)
 	}
 }

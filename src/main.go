@@ -11,7 +11,7 @@ import (
 )
 
 var healthchecker checker.Checker = checker.Checker{
-	SecondBetweenRuns: 5,
+	SecondsBetweenRuns: 5,
 	Targets: []domain.HealthcheckTarget{
 		{
 			Uri:          "http://www.google.com",
@@ -34,9 +34,10 @@ func main() {
 			"application": "Healthchecker",
 		})
 	})
+
 	router.GET("/healthchecks", getHealthchecks)
 
-	go healthchecker.Check()
+	healthchecker.Start()
 	router.Run("127.0.0.1:8080")
 }
 
