@@ -7,11 +7,11 @@ import (
 
 	"soupdevsolutions/healthchecker/domain"
 
-	"soupdevsolutions/healthchecker/checker"
+	"soupdevsolutions/healthchecker/runner"
 )
 
-var healthchecker checker.Checker = checker.Checker{
-	SecondsBetweenRuns: 5,
+var healthchecker runner.HealthcheckRunner = runner.HealthcheckRunner{
+	Delay: 5,
 	Targets: []domain.HealthcheckTarget{
 		{
 			Uri:          "http://www.google.com",
