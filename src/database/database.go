@@ -6,15 +6,17 @@ import (
 	"errors"
 	"log"
 	"soupdevsolutions/healthchecker/healthcheck"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 )
 
 type Database struct {
 	db *sql.DB
 }
 
-func Connect(ctx context.Context) (*Database, error) {
-	connectionInfo := ""
-	db, err := sql.Open("postgres", connectionInfo)
+func Connect(ctx context.Context, connectionString string) (*Database, error) {
+	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		log.Fatal(err)
 		return nil, errors.New("could not open a connection to the database")
@@ -26,6 +28,25 @@ func Connect(ctx context.Context) (*Database, error) {
 	}
 
 	return &Database{db: db}, nil
+}
+
+func (db *Database) Migrate() error {
+	driver, err := postgres.WithInstance(db.db, &postgres.Config{})
+	if err != nil {
+		log.Fatal(err)
+		return errors.New("could not create a postgres instance")
+	}
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://../migrations",
+		"postgres", driver)
+	if err != nil {
+		log.Fatal(err)
+		return errors.New("could not init `migrate`")
+	}
+
+	m.Up()
+
+	return nil
 }
 
 func (db *Database) InsertTarget(target *healthcheck.HealthcheckTarget) error {

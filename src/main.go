@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
+	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"soupdevsolutions/healthchecker/runner"
 )
@@ -12,6 +14,17 @@ import (
 var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runner.CheckHttpTarget)
 
 func main() {
+	ctx := context.Background()
+
+	connectionString := ""
+	database, err := database.Connect(ctx, connectionString)
+	if err != nil {
+		panic(err)
+	}
+	err = database.Migrate()
+	if err != nil {
+		panic(err)
+	}
 
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
