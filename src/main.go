@@ -5,26 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"soupdevsolutions/healthchecker/domain"
-
+	"soupdevsolutions/healthchecker/healthcheck"
 	"soupdevsolutions/healthchecker/runner"
 )
 
-var healthchecker runner.HealthcheckRunner = runner.HealthcheckRunner{
-	Delay: 5,
-	Targets: []domain.HealthcheckTarget{
-		{
-			Uri:          "http://www.google.com",
-			Name:         "Google",
-			Healthchecks: []domain.Healthcheck{},
-		},
-		{
-			Uri:          "http://www.yahoo.com",
-			Name:         "Yahoo",
-			Healthchecks: []domain.Healthcheck{},
-		},
-	},
-}
+var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runner.CheckHttpTarget)
 
 func main() {
 
@@ -37,6 +22,18 @@ func main() {
 
 	router.GET("/healthchecks", getHealthchecks)
 
+	healthchecker.Targets = []healthcheck.HealthcheckTarget{
+		{
+			Uri:          "http://www.google.com",
+			Name:         "Google",
+			Healthchecks: []healthcheck.Healthcheck{},
+		},
+		{
+			Uri:          "http://www.yahoo.com",
+			Name:         "Yahoo",
+			Healthchecks: []healthcheck.Healthcheck{},
+		},
+	}
 	healthchecker.Start()
 	router.Run("127.0.0.1:8080")
 }
