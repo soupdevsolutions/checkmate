@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"soupdevsolutions/healthchecker/runner"
@@ -15,8 +16,12 @@ var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runn
 
 func main() {
 	ctx := context.Background()
+	config, err := config.ReadConfig()
+	if err != nil {
+		panic(err)
+	}
 
-	connectionString := ""
+	connectionString := config.Database.GetConnectionString()
 	database, err := database.Connect(ctx, connectionString)
 	if err != nil {
 		panic(err)

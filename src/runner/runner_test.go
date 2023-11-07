@@ -35,7 +35,7 @@ func TestRunCheckers(t *testing.T) {
 	// a checker that always returns a 200 status code
 	ok_checker := func(target healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error) {
 		return healthcheck.Healthcheck{
-			Status:    healthcheck.HEALTHY,
+			Status:    healthcheck.Healthy,
 			Timestamp: time.Now().Unix(),
 		}, nil
 	}
