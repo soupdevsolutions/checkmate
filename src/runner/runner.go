@@ -2,21 +2,21 @@ package runner
 
 import (
 	"log"
-	"soupdevsolutions/healthchecker/domain"
+	"soupdevsolutions/healthchecker/healthcheck"
 	"time"
 )
 
 type HealthcheckRunner struct {
-	Targets []domain.HealthcheckTarget
+	Targets []healthcheck.HealthcheckTarget
 	Delay   int
 	running bool
-	checker func(domain.HealthcheckTarget) (domain.Healthcheck, error)
+	checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)
 }
 
-func NewHealthcheckRunner(delay int, checker func(domain.HealthcheckTarget) (domain.Healthcheck, error)) HealthcheckRunner {
+func NewHealthcheckRunner(delay int, checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)) HealthcheckRunner {
 	return HealthcheckRunner{
 		Delay:   delay,
-		Targets: []domain.HealthcheckTarget{},
+		Targets: []healthcheck.HealthcheckTarget{},
 		running: false,
 		checker: checker,
 	}
@@ -40,8 +40,6 @@ func (c *HealthcheckRunner) run() {
 		time.Sleep(time.Duration(c.Delay) * time.Second)
 
 		for i, target := range c.Targets {
-			log.Println("Checking target: ", target.Name)
-
 			result, err := c.checker(target)
 			if err != nil {
 				log.Println("Error checking target: ", err)

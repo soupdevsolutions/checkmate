@@ -1,6 +1,7 @@
-package domain
+package healthcheck
 
 type HealthcheckTarget struct {
+	Id           string
 	Uri          string        `json:"uri"`
 	Name         string        `json:"name"`
 	Healthchecks []Healthcheck `json:"healthchecks"`
@@ -15,6 +16,7 @@ func NewHealthcheckTarget(name string, uri string) HealthcheckTarget {
 }
 
 type Healthcheck struct {
-	StatusCode int   `json:"statusCode"`
-	Timestamp  int64 `json:"timestamp"`
+	Id        string
+	Status    HealthcheckStatus `json:"status"`
+	Timestamp int64             `json:"timestamp"`
 }

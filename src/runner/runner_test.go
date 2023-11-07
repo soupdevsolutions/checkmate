@@ -1,7 +1,7 @@
 package runner
 
 import (
-	"soupdevsolutions/healthchecker/domain"
+	"soupdevsolutions/healthchecker/healthcheck"
 	"testing"
 	"time"
 )
@@ -10,7 +10,7 @@ func TestStartStop(t *testing.T) {
 
 	runner := HealthcheckRunner{
 		Delay:   5,
-		Targets: []domain.HealthcheckTarget{domain.NewHealthcheckTarget("Test", "http://localhost:8080")},
+		Targets: []healthcheck.HealthcheckTarget{healthcheck.NewHealthcheckTarget("Test", "http://localhost:8080")},
 	}
 
 	runner.Start()
@@ -33,15 +33,15 @@ func TestStartStop(t *testing.T) {
 
 func TestRunCheckers(t *testing.T) {
 	// a checker that always returns a 200 status code
-	ok_checker := func(target domain.HealthcheckTarget) (domain.Healthcheck, error) {
-		return domain.Healthcheck{
-			StatusCode: 200,
-			Timestamp:  time.Now().Unix(),
+	ok_checker := func(target healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error) {
+		return healthcheck.Healthcheck{
+			Status:    healthcheck.HEALTHY,
+			Timestamp: time.Now().Unix(),
 		}, nil
 	}
 
 	runner := NewHealthcheckRunner(1, ok_checker)
-	runner.Targets = []domain.HealthcheckTarget{domain.NewHealthcheckTarget("Test", "http://localhost:8080")}
+	runner.Targets = []healthcheck.HealthcheckTarget{healthcheck.NewHealthcheckTarget("Test", "http://localhost:8080")}
 
 	runner.Start()
 	// Give the runner some time to run the healthchecks
