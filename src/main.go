@@ -9,11 +9,11 @@ import (
 
 	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/database"
-	"soupdevsolutions/healthchecker/healthcheck"
 	"soupdevsolutions/healthchecker/runner"
 )
 
 var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runner.CheckHttpTarget)
+var db *database.Database
 
 func main() {
 	log.Println("starting application")
@@ -27,19 +27,14 @@ func main() {
 		panic(err)
 	}
 
-	log.Println("connecting to database")
-	connectionString := config.Database.GetConnectionString()
-	database, err := database.Connect(ctx, connectionString)
+	db, err = database.InitDatabase(ctx, config.Database.GetConnectionString())
 	if err != nil {
-		log.Println("error connecting to database")
+		log.Println("error initializing database")
 		panic(err)
 	}
-	log.Println("applying migrations")
-	err = database.Migrate()
-	if err != nil {
-		log.Println("error applying migrations")
-		panic(err)
-	}
+	db.Seed()
+
+	healthchecker.Start()
 
 	log.Println("starting web server")
 	router := gin.Default()
@@ -50,24 +45,13 @@ func main() {
 	})
 
 	router.GET("/healthchecks", getHealthchecks)
-
-	healthchecker.Targets = []healthcheck.HealthcheckTarget{
-		{
-			Uri:          "http://www.google.com",
-			Name:         "Google",
-			Healthchecks: []healthcheck.Healthcheck{},
-		},
-		{
-			Uri:          "http://www.yahoo.com",
-			Name:         "Yahoo",
-			Healthchecks: []healthcheck.Healthcheck{},
-		},
-	}
-	healthchecker.Start()
 	router.Run("127.0.0.1:8080")
 }
 
 func getHealthchecks(c *gin.Context) {
-
-	c.JSON(http.StatusOK, gin.H{"targets": healthchecker.Targets})
+	targets, err := db.GetTargets(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, gin.H{"targets": targets})
 }
