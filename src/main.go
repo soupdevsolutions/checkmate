@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,22 +16,32 @@ import (
 var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runner.CheckHttpTarget)
 
 func main() {
+	log.Println("starting application")
+
 	ctx := context.Background()
+
+	log.Println("reading config")
 	config, err := config.ReadConfig()
 	if err != nil {
+		log.Println("error reading config")
 		panic(err)
 	}
 
+	log.Println("connecting to database")
 	connectionString := config.Database.GetConnectionString()
 	database, err := database.Connect(ctx, connectionString)
 	if err != nil {
+		log.Println("error connecting to database")
 		panic(err)
 	}
+	log.Println("applying migrations")
 	err = database.Migrate()
 	if err != nil {
+		log.Println("error applying migrations")
 		panic(err)
 	}
 
+	log.Println("starting web server")
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

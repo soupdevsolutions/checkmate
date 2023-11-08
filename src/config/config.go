@@ -8,13 +8,15 @@ import (
 )
 
 type DatabaseConfig struct {
-	Name string `yaml:"name"`
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Name     string `yaml:"name"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
 }
 
 func (db *DatabaseConfig) GetConnectionString() string {
-	return fmt.Sprintf("Host=%s; Port=%d; Database=%s;", db.Host, db.Port, db.Name)
+	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", db.Username, db.Password, db.Host, db.Port, db.Name)
 }
 
 type Config struct {
