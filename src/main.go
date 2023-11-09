@@ -13,7 +13,7 @@ import (
 )
 
 var db *database.Database
-var healthchecker runner.HealthcheckRunner
+var hcRunner runner.HealthcheckRunner
 
 func main() {
 	log.Println("starting application")
@@ -34,8 +34,8 @@ func main() {
 	}
 	db.Seed()
 
-	healthchecker = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
-	healthchecker.Start()
+	hcRunner = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
+	hcRunner.Start()
 
 	log.Println("starting web server")
 	router := gin.Default()
@@ -50,6 +50,6 @@ func main() {
 }
 
 func getHealthchecks(c *gin.Context) {
-	targets := healthchecker.Targets()
+	targets := hcRunner.Targets()
 	c.JSON(http.StatusOK, gin.H{"targets": targets})
 }
