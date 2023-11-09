@@ -19,6 +19,10 @@ type Database struct {
 	config config.DatabaseConfig
 }
 
+func NewDatabase(db *sql.DB) *Database {
+	return &Database{db: db}
+}
+
 func InitDatabase(ctx context.Context, config config.DatabaseConfig) (*Database, error) {
 	log.Println("initializing database")
 	database, err := Connect(ctx, config.GetConnectionString())
@@ -88,7 +92,8 @@ func (db *Database) Seed() {
 		},
 	}
 
+	targetsRepo := NewTargetsRepository(db)
 	for _, target := range targets {
-		db.InsertTarget(&target)
+		targetsRepo.InsertTarget(&target)
 	}
 }

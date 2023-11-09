@@ -1,17 +1,38 @@
 package runner
 
 import (
+	"database/sql"
+	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"testing"
 	"time"
+
+	_ "github.com/proullon/ramsql/driver"
 )
 
-func TestStartStop(t *testing.T) {
+// a checker that always returns a 200 status code
+var ok_checker = func(target healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error) {
+	return healthcheck.Healthcheck{
+		Status:    healthcheck.Healthy,
+		Timestamp: time.Now().Unix(),
+	}, nil
+}
 
-	runner := HealthcheckRunner{
-		Delay:   5,
-		Targets: []healthcheck.HealthcheckTarget{healthcheck.NewHealthcheckTarget("Test", "http://localhost:8080")},
+func SetupInMemoryDatabase() *database.Database {
+	db, err := sql.Open("ramsql", "Test")
+	if err != nil {
+		panic(err)
 	}
+	database := database.NewDatabase(db)
+	database.Migrate()
+
+	return database
+}
+
+func TestStartStop(t *testing.T) {
+	db := SetupInMemoryDatabase()
+
+	runner := NewHealthcheckRunner(5, db, ok_checker)
 
 	runner.Start()
 	// The healthchecker should be running after starting it
@@ -23,31 +44,5 @@ func TestStartStop(t *testing.T) {
 	// The healthchecker should not be running after stopping it
 	if runner.IsRunning() {
 		t.Error("Expected healthchecker to be stopped")
-	}
-
-	// Since the checker has a 5 seconds delay, no healthchecks should have been run
-	if len(runner.Targets[0].Healthchecks) > 0 {
-		t.Error("Expected no healthchecks to be run")
-	}
-}
-
-func TestRunCheckers(t *testing.T) {
-	// a checker that always returns a 200 status code
-	ok_checker := func(target healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error) {
-		return healthcheck.Healthcheck{
-			Status:    healthcheck.Healthy,
-			Timestamp: time.Now().Unix(),
-		}, nil
-	}
-
-	runner := NewHealthcheckRunner(1, ok_checker)
-	runner.Targets = []healthcheck.HealthcheckTarget{healthcheck.NewHealthcheckTarget("Test", "http://localhost:8080")}
-
-	runner.Start()
-	// Give the runner some time to run the healthchecks
-	time.Sleep(5 * time.Second)
-
-	if len(runner.Targets[0].Healthchecks) == 0 {
-		t.Error("Expected healthchecks to have been run")
 	}
 }

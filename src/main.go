@@ -12,8 +12,8 @@ import (
 	"soupdevsolutions/healthchecker/runner"
 )
 
-var healthchecker runner.HealthcheckRunner = runner.NewHealthcheckRunner(5, runner.CheckHttpTarget)
 var db *database.Database
+var healthchecker runner.HealthcheckRunner
 
 func main() {
 	log.Println("starting application")
@@ -34,6 +34,7 @@ func main() {
 	}
 	db.Seed()
 
+	healthchecker = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
 	healthchecker.Start()
 
 	log.Println("starting web server")
@@ -49,9 +50,6 @@ func main() {
 }
 
 func getHealthchecks(c *gin.Context) {
-	targets, err := db.GetTargets(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
+	targets := healthchecker.Targets()
 	c.JSON(http.StatusOK, gin.H{"targets": targets})
 }

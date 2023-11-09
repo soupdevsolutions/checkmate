@@ -1,24 +1,27 @@
 package runner
 
 import (
+	"context"
 	"log"
+	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"time"
 )
 
 type HealthcheckRunner struct {
-	Targets []healthcheck.HealthcheckTarget
 	Delay   int
 	running bool
 	checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)
+	db      *database.Database
+	targets []healthcheck.HealthcheckTarget
 }
 
-func NewHealthcheckRunner(delay int, checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)) HealthcheckRunner {
+func NewHealthcheckRunner(delay int, db *database.Database, checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)) HealthcheckRunner {
 	return HealthcheckRunner{
 		Delay:   delay,
-		Targets: []healthcheck.HealthcheckTarget{},
 		running: false,
 		checker: checker,
+		db:      db,
 	}
 }
 
@@ -36,17 +39,31 @@ func (c *HealthcheckRunner) IsRunning() bool {
 }
 
 func (c *HealthcheckRunner) run() {
+	ctx := context.Background()
+	targetsRepo := database.NewTargetsRepository(c.db)
+
 	for c.running {
 		time.Sleep(time.Duration(c.Delay) * time.Second)
 
-		for i, target := range c.Targets {
+		targets, err := targetsRepo.GetTargets(ctx)
+		if err != nil {
+			log.Println("error getting targets: ", err)
+			continue
+		}
+
+		for i, target := range targets {
 			result, err := c.checker(target)
 			if err != nil {
 				log.Println("Error checking target: ", err)
 				continue
 			}
 
-			c.Targets[i].Healthchecks = append(c.Targets[i].Healthchecks, result)
+			targets[i].Healthchecks = append(targets[i].Healthchecks, result)
 		}
+		c.targets = targets
 	}
+}
+
+func (c *HealthcheckRunner) Targets() []healthcheck.HealthcheckTarget {
+	return c.targets
 }

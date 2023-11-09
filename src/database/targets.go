@@ -7,8 +7,18 @@ import (
 	"soupdevsolutions/healthchecker/healthcheck"
 )
 
-func (db *Database) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTarget, error) {
-	rows, err := db.db.QueryContext(ctx, "SELECT id, name, uri FROM targets")
+type TargetsRepository struct {
+	db *Database
+}
+
+func NewTargetsRepository(db *Database) TargetsRepository {
+	return TargetsRepository{
+		db: db,
+	}
+}
+
+func (repo *TargetsRepository) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTarget, error) {
+	rows, err := repo.db.db.QueryContext(ctx, "SELECT id, name, uri FROM targets")
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("could not get targets")
@@ -29,8 +39,8 @@ func (db *Database) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTa
 	return targets, nil
 }
 
-func (db *Database) InsertTarget(target *healthcheck.HealthcheckTarget) error {
-	_, err := db.db.Exec(
+func (repo *TargetsRepository) InsertTarget(target *healthcheck.HealthcheckTarget) error {
+	_, err := repo.db.db.Exec(
 		"INSERT INTO targets (name, uri) VALUES ($1, $2)",
 		target.Name,
 		target.Uri,
