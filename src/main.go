@@ -27,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err = database.InitDatabase(ctx, config.Database.GetConnectionString())
+	db, err = database.InitDatabase(ctx, config.Database)
 	if err != nil {
 		log.Println("error initializing database")
 		panic(err)

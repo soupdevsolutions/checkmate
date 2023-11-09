@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
+	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/healthcheck"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -13,19 +15,19 @@ import (
 )
 
 type Database struct {
-	db *sql.DB
+	db     *sql.DB
+	config config.DatabaseConfig
 }
 
-func InitDatabase(ctx context.Context, connectionString string) (*Database, error) {
-	database, err := Connect(ctx, connectionString)
+func InitDatabase(ctx context.Context, config config.DatabaseConfig) (*Database, error) {
+	log.Println("initializing database")
+	database, err := Connect(ctx, config.GetConnectionString())
 	if err != nil {
-		log.Println("error connecting to database")
-		panic(err)
+		log.Fatal("error connecting to database")
 	}
 	err = database.Migrate()
 	if err != nil {
-		log.Println("error applying migrations")
-		panic(err)
+		log.Fatal("error applying migrations")
 	}
 
 	return database, nil
@@ -35,12 +37,12 @@ func Connect(ctx context.Context, connectionString string) (*Database, error) {
 	log.Println("connecting to database")
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("error opening connection to database: %v", err)
 		return nil, errors.New("could not open a connection to the database")
 	}
 
 	if err := db.PingContext(ctx); err != nil {
-		log.Fatal(err)
+		log.Printf("error pinging database: %v", err)
 		return nil, errors.New("could not ping the database")
 	}
 
@@ -49,20 +51,24 @@ func Connect(ctx context.Context, connectionString string) (*Database, error) {
 
 func (db *Database) Migrate() error {
 	log.Println("applying migrations")
-	driver, err := postgres.WithInstance(db.db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.db, &postgres.Config{MigrationsTable: "migrations"})
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return errors.New("could not create a postgres instance")
 	}
+	fmt.Println(db.config.Name)
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://../migrations",
-		"postgres", driver)
+		db.config.Name, driver)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return errors.New("could not init `migrate`")
 	}
 
-	m.Up()
+	if err = m.Up(); err != nil {
+		log.Println(err)
+		return errors.New("could not apply migrations")
+	}
 
 	return nil
 }

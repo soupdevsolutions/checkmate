@@ -8,9 +8,9 @@ import (
 )
 
 func (db *Database) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTarget, error) {
-	rows, err := db.db.QueryContext(ctx, "SELECT target_id, name, uri FROM targets")
+	rows, err := db.db.QueryContext(ctx, "SELECT id, name, uri FROM targets")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, errors.New("could not get targets")
 	}
 	defer rows.Close()
@@ -20,7 +20,7 @@ func (db *Database) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTa
 		var target healthcheck.HealthcheckTarget
 		err := rows.Scan(&target.Id, &target.Name, &target.Uri)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			return nil, errors.New("could not get targets")
 		}
 		targets = append(targets, target)
@@ -31,13 +31,12 @@ func (db *Database) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTa
 
 func (db *Database) InsertTarget(target *healthcheck.HealthcheckTarget) error {
 	_, err := db.db.Exec(
-		"INSERT INTO targets (target_id, name, uri) VALUES ($1, $2, $3)",
-		target.Id,
+		"INSERT INTO targets (name, uri) VALUES ($1, $2)",
 		target.Name,
 		target.Uri,
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return errors.New("could not insert target")
 	}
 

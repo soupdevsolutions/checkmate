@@ -14,7 +14,7 @@ func (db *Database) InsertHealthcheck(target *healthcheck.HealthcheckTarget, hea
 		healthcheck.Timestamp,
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return errors.New("could not insert healthcheck")
 	}
 
