@@ -5,11 +5,17 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
-    paths: ["./src/**", "./github/**"]
+    branches:
+      - main
+    paths: 
+      - './src/**'
+      - './github/**'
   pull_request:
-    branches: [ "main" ]
-    paths: ["./src", "./github/**"]
+    branches:
+      - main
+    paths: 
+      - './src'
+      - './github/**'
 
 defaults:
   run:
