@@ -41,6 +41,7 @@ func (c *HealthcheckRunner) IsRunning() bool {
 func (c *HealthcheckRunner) run() {
 	ctx := context.Background()
 	targetsRepo := database.NewTargetsRepository(c.db)
+	healthchecksRepo := database.NewHealthchecksRepository(c.db)
 
 	for c.running {
 		time.Sleep(time.Duration(c.Delay) * time.Second)
@@ -59,6 +60,11 @@ func (c *HealthcheckRunner) run() {
 			}
 
 			targets[i].Healthchecks = append(targets[i].Healthchecks, result)
+			err = healthchecksRepo.InsertHealthcheck(ctx, &targets[i], &result)
+			if err != nil {
+				log.Println("Error inserting healthcheck: ", err)
+				continue
+			}
 		}
 		c.targets = targets
 	}

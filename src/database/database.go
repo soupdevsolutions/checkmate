@@ -15,12 +15,12 @@ import (
 )
 
 type Database struct {
-	db     *sql.DB
+	client *sql.DB
 	config config.DatabaseConfig
 }
 
 func NewDatabase(db *sql.DB) *Database {
-	return &Database{db: db}
+	return &Database{client: db}
 }
 
 func InitDatabase(ctx context.Context, config config.DatabaseConfig) (*Database, error) {
@@ -50,12 +50,12 @@ func Connect(ctx context.Context, connectionString string) (*Database, error) {
 		return nil, errors.New("could not ping the database")
 	}
 
-	return &Database{db: db}, nil
+	return &Database{client: db}, nil
 }
 
 func (db *Database) Migrate() error {
 	log.Println("applying migrations")
-	driver, err := postgres.WithInstance(db.db, &postgres.Config{MigrationsTable: "migrations"})
+	driver, err := postgres.WithInstance(db.client, &postgres.Config{MigrationsTable: "migrations"})
 	if err != nil {
 		log.Println(err)
 		return errors.New("could not create a postgres instance")
@@ -77,7 +77,7 @@ func (db *Database) Migrate() error {
 	return nil
 }
 
-func (db *Database) Seed() {
+func (db *Database) Seed(ctx context.Context) {
 	log.Println("seeding database")
 	targets := []healthcheck.HealthcheckTarget{
 		{
@@ -94,6 +94,6 @@ func (db *Database) Seed() {
 
 	targetsRepo := NewTargetsRepository(db)
 	for _, target := range targets {
-		targetsRepo.InsertTarget(&target)
+		targetsRepo.InsertTarget(ctx, &target)
 	}
 }

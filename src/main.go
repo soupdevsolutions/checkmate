@@ -32,7 +32,7 @@ func main() {
 		log.Println("error initializing database")
 		panic(err)
 	}
-	db.Seed()
+	db.Seed(ctx)
 
 	hcRunner = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
 	hcRunner.Start()
@@ -50,6 +50,11 @@ func main() {
 }
 
 func getHealthchecks(c *gin.Context) {
-	targets := hcRunner.Targets()
+	repo := database.NewTargetsRepository(db)
+	targets, err := repo.GetTargets(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"targets": targets})
 }

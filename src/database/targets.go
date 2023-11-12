@@ -18,17 +18,25 @@ func NewTargetsRepository(db *Database) TargetsRepository {
 }
 
 func (repo *TargetsRepository) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTarget, error) {
-	rows, err := repo.db.db.QueryContext(ctx, "SELECT id, name, uri FROM targets")
+
+	tx, err := repo.db.client.BeginTx(ctx, nil)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("could not get targets")
 	}
-	defer rows.Close()
+	defer tx.Rollback()
+
+	targetsRows, err := tx.QueryContext(ctx, "SELECT id, name, uri FROM targets")
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("could not get targets")
+	}
+	defer targetsRows.Close()
 
 	targets := make([]healthcheck.HealthcheckTarget, 0)
-	for rows.Next() {
+	for targetsRows.Next() {
 		var target healthcheck.HealthcheckTarget
-		err := rows.Scan(&target.Id, &target.Name, &target.Uri)
+		err := targetsRows.Scan(&target.Id, &target.Name, &target.Uri)
 		if err != nil {
 			log.Println(err)
 			return nil, errors.New("could not get targets")
@@ -36,11 +44,36 @@ func (repo *TargetsRepository) GetTargets(ctx context.Context) ([]healthcheck.He
 		targets = append(targets, target)
 	}
 
+	for i, target := range targets {
+		healthchecksLimit := 5
+		healthchecksRows, err := tx.QueryContext(
+			ctx,
+			"SELECT id, status, timestamp FROM healthchecks WHERE target_id = $1 LIMIT $2",
+			target.Id,
+			healthchecksLimit)
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("could not get healthchecks for target " + target.Name)
+		}
+		defer healthchecksRows.Close()
+
+		for healthchecksRows.Next() {
+			var healthcheck healthcheck.Healthcheck
+			err := healthchecksRows.Scan(&healthcheck.Id, &healthcheck.Status, &healthcheck.Timestamp)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New("could not get healthchecks for target " + target.Name)
+			}
+			targets[i].Healthchecks = append(targets[i].Healthchecks, healthcheck)
+		}
+	}
+
 	return targets, nil
 }
 
-func (repo *TargetsRepository) InsertTarget(target *healthcheck.HealthcheckTarget) error {
-	_, err := repo.db.db.Exec(
+func (repo *TargetsRepository) InsertTarget(ctx context.Context, target *healthcheck.HealthcheckTarget) error {
+	_, err := repo.db.client.ExecContext(
+		ctx,
 		"INSERT INTO targets (name, uri) VALUES ($1, $2)",
 		target.Name,
 		target.Uri,
