@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -39,17 +40,26 @@ func main() {
 
 	log.Println("starting web server")
 	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"application": "Healthchecker",
-		})
-	})
 
-	router.GET("/healthchecks", getHealthchecks)
+	views := router.Group("/")
+	{
+		views.GET("/healthchecks", getHealthchecksView)
+	}
+
+	api := router.Group("/api")
+	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"application": "Healthchecker",
+			})
+		})
+		api.GET("/healthchecks", getHealthchecksJson)
+	}
+
 	router.Run("127.0.0.1:8080")
 }
 
-func getHealthchecks(c *gin.Context) {
+func getHealthchecksJson(c *gin.Context) {
 	repo := database.NewTargetsRepository(db)
 	targets, err := repo.GetTargets(c)
 	if err != nil {
@@ -57,4 +67,21 @@ func getHealthchecks(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"targets": targets})
+}
+
+func getHealthchecksView(c *gin.Context) {
+	repo := database.NewTargetsRepository(db)
+	targets, err := repo.GetTargets(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("../templates/index.html"))
+
+	err = tmpl.Execute(c.Writer, gin.H{"targets": targets})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 }

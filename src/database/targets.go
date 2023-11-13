@@ -48,7 +48,7 @@ func (repo *TargetsRepository) GetTargets(ctx context.Context) ([]healthcheck.He
 		healthchecksLimit := 5
 		healthchecksRows, err := tx.QueryContext(
 			ctx,
-			"SELECT id, status, timestamp FROM healthchecks WHERE target_id = $1 LIMIT $2",
+			"SELECT id, status, timestamp FROM healthchecks WHERE target_id = $1 ORDER BY timestamp DESC LIMIT $2",
 			target.Id,
 			healthchecksLimit)
 		if err != nil {

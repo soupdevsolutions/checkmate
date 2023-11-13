@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+</head>
+
+<body>
+    <h1>Healthchecks</h1>
+
+    <ul>
+        {{range .targets}}
+        <li>{{ .Name }} | <a href={{ .Uri }}>{{ .Uri }}</a></li>
+        <ul>
+            {{range .Healthchecks}}
+            <li>{{ .Status }} | {{ .Timestamp }}</li>
+            {{end}}
+        </ul>
+        {{end}}
+    </ul>
+</body>
+
+</html>

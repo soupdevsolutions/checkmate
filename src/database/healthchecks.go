@@ -18,7 +18,7 @@ func NewHealthchecksRepository(db *Database) HealthchecksRepository {
 }
 
 func (repo *HealthchecksRepository) GetHealthchecks(ctx context.Context, targetId string, limit int) ([]healthcheck.Healthcheck, error) {
-	rows, err := repo.db.client.QueryContext(ctx, "SELECT id, status, timestamp FROM healthchecks WHERE target_id = $1 LIMIT $2", targetId, limit)
+	rows, err := repo.db.client.QueryContext(ctx, "SELECT id, status, timestamp FROM healthchecks WHERE target_id = $1 ORDER BY timestamp DESC LIMIT $2", targetId, limit)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("could not get healthchecks")
