@@ -3,21 +3,43 @@
 
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clifford: '#da373d',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body>
-    <h1>Healthchecks</h1>
+<body class="container mx-auto bg-white">
+    <div id="content" class="flex-auto bg-orange-300">
 
-    <ul>
-        {{range .targets}}
-        <li>{{ .Name }} | <a href={{ .Uri }}>{{ .Uri }}</a></li>
-        <ul>
-            {{range .Healthchecks}}
-            <li>{{ .Status }} | {{ .Timestamp }}</li>
+        <h1 class="text-3xl">Healthchecks</h1>
+
+        <ul class="flex-auto bg-slate-200 p-2 flex flex-initial flex-wrap">
+            {{range .targets}}
+            <div class="m-2 p-1 w-72 text-xl border border-solid rounded-lg border-black">
+                <li hx-get={{ .Id | printf "targets?id=%s" }} hx-target="#details">{{ .Name }}
+                    <ul class="text-base">
+                        {{range .Healthchecks}}
+                        <li {{if eq .Status 1}} class="text-green-600" {{else}} class="text-red-600" {{end}}>
+                            {{.Status }} | {{ .Timestamp }}
+                        </li>
+                        {{end}}
+                    </ul>
+                </li>
+            </div>
             {{end}}
         </ul>
-        {{end}}
-    </ul>
+
+        <div id="details"></div>
+    </div>
 </body>
 
 </html>

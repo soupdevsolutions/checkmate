@@ -35,7 +35,7 @@ func main() {
 	}
 	db.Seed(ctx)
 
-	hcRunner = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
+	hcRunner = runner.NewHealthcheckRunner(60, db, runner.CheckHttpTarget)
 	hcRunner.Start()
 
 	log.Println("starting web server")
@@ -43,7 +43,7 @@ func main() {
 
 	views := router.Group("/")
 	{
-		views.GET("/healthchecks", getHealthchecksView)
+		views.GET("/", getHealthchecksView)
 	}
 
 	api := router.Group("/api")
