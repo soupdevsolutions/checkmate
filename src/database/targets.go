@@ -17,6 +17,19 @@ func NewTargetsRepository(db *Database) TargetsRepository {
 	}
 }
 
+func (repo *TargetsRepository) GetTarget(ctx context.Context, id string) (healthcheck.HealthcheckTarget, error) {
+	row := repo.db.client.QueryRowContext(ctx, "SELECT id, name, uri FROM targets WHERE id = $1", id)
+
+	var target healthcheck.HealthcheckTarget
+	err := row.Scan(&target.Id, &target.Name, &target.Uri)
+	if err != nil {
+		log.Println(err)
+		return target, errors.New("could not get target")
+	}
+
+	return target, nil
+}
+
 func (repo *TargetsRepository) GetTargets(ctx context.Context) ([]healthcheck.HealthcheckTarget, error) {
 
 	tx, err := repo.db.client.BeginTx(ctx, nil)

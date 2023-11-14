@@ -35,7 +35,7 @@ func main() {
 	}
 	db.Seed(ctx)
 
-	hcRunner = runner.NewHealthcheckRunner(60, db, runner.CheckHttpTarget)
+	hcRunner = runner.NewHealthcheckRunner(5, db, runner.CheckHttpTarget)
 	hcRunner.Start()
 
 	log.Println("starting web server")
@@ -44,6 +44,7 @@ func main() {
 	views := router.Group("/")
 	{
 		views.GET("/", getHealthchecksView)
+		views.GET("/targets", getTargetView)
 	}
 
 	api := router.Group("/api")
@@ -80,6 +81,26 @@ func getHealthchecksView(c *gin.Context) {
 	tmpl := template.Must(template.ParseFiles("../templates/index.html"))
 
 	err = tmpl.Execute(c.Writer, gin.H{"targets": targets})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+}
+
+func getTargetView(c *gin.Context) {
+	targetId := c.Query("id")
+	repo := database.NewTargetsRepository(db)
+
+	target, err := repo.GetTarget(c, targetId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("target: %+v", target)
+
+	tmpl := template.Must(template.ParseFiles("../templates/target.html"))
+	err = tmpl.Execute(c.Writer, gin.{"target": target})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
