@@ -100,7 +100,7 @@ func getTargetView(c *gin.Context) {
 	log.Printf("target: %+v", target)
 
 	tmpl := template.Must(template.ParseFiles("../templates/target.html"))
-	err = tmpl.Execute(c.Writer, gin.{"target": target})
+	err = tmpl.Execute(c.Writer, gin.H{"target": target})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
