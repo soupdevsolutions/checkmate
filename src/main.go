@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/runner"
+	"soupdevsolutions/healthchecker/viewmodels"
 )
 
 var db *database.Database
@@ -43,7 +45,7 @@ func main() {
 
 	views := router.Group("/")
 	{
-		views.GET("/", getHealthchecksView)
+		views.GET("/", getTargetsView)
 		views.GET("/targets", getTargetView)
 	}
 
@@ -54,13 +56,13 @@ func main() {
 				"application": "Healthchecker",
 			})
 		})
-		api.GET("/healthchecks", getHealthchecksJson)
+		api.GET("/healthchecks", getTargetsJson)
 	}
 
 	router.Run("127.0.0.1:8080")
 }
 
-func getHealthchecksJson(c *gin.Context) {
+func getTargetsJson(c *gin.Context) {
 	repo := database.NewTargetsRepository(db)
 	targets, err := repo.GetTargets(c)
 	if err != nil {
@@ -70,7 +72,7 @@ func getHealthchecksJson(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"targets": targets})
 }
 
-func getHealthchecksView(c *gin.Context) {
+func getTargetsView(c *gin.Context) {
 	repo := database.NewTargetsRepository(db)
 	targets, err := repo.GetTargets(c)
 	if err != nil {
@@ -78,9 +80,17 @@ func getHealthchecksView(c *gin.Context) {
 		return
 	}
 
+	var targetsVms []viewmodels.TargetViewModel
+
+	for _, target := range targets {
+		targetsVms = append(targetsVms, viewmodels.NewTargetViewModel(&target))
+	}
+
 	tmpl := template.Must(template.ParseFiles("../templates/index.html"))
 
-	err = tmpl.Execute(c.Writer, gin.H{"targets": targets})
+	fmt.Printf("targets: %+v", targetsVms)
+
+	err = tmpl.Execute(c.Writer, gin.H{"targets": targetsVms})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -97,10 +107,10 @@ func getTargetView(c *gin.Context) {
 		return
 	}
 
-	log.Printf("target: %+v", target)
+	targetVm := viewmodels.NewTargetViewModel(target)
 
 	tmpl := template.Must(template.ParseFiles("../templates/target.html"))
-	err = tmpl.Execute(c.Writer, gin.H{"target": target})
+	err = tmpl.Execute(c.Writer, gin.H{"target": targetVm})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

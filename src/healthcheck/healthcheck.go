@@ -15,6 +15,14 @@ func NewHealthcheckTarget(name string, uri string) HealthcheckTarget {
 	}
 }
 
+func (ht *HealthcheckTarget) Status() HealthcheckStatus {
+	if len(ht.Healthchecks) == 0 {
+		return Unknown
+	}
+
+	return ht.Healthchecks[len(ht.Healthchecks)-1].Status
+}
+
 type Healthcheck struct {
 	Id        string
 	Status    HealthcheckStatus `json:"status"`

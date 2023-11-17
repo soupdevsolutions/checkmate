@@ -17,28 +17,28 @@
     </script>
 </head>
 
-<body class="container mx-auto bg-white">
-    <div id="content" class="flex-auto bg-orange-300">
-
-        <h1 class="text-3xl">Healthchecks</h1>
-
+<body class="mx-auto bg-white">
+    <nav class="bg-orange-300 mb-2 p-2">
+        <h1 class="text-3xl"><a href="/">Soupdev Healthchecker</a></h1>
+    </nav>
+    <div id="content" class="container mx-auto flex-auto bg-orange-300">
         <ul class="flex-auto bg-slate-200 p-2 flex flex-initial flex-wrap">
             {{range .targets}}
-            <div class="m-2 p-1 w-72 text-xl border border-solid rounded-lg border-black">
-                <li hx-get={{ .Id | printf "targets?id=%s" }} hx-target="#details">{{ .Name }}
-                    <ul class="text-base">
-                        {{range .Healthchecks}}
-                        <li {{if eq .Status 1}} class="text-green-600" {{else}} class="text-red-600" {{end}}>
-                            {{.Status }} | {{ .Timestamp }}
-                        </li>
-                        {{end}}
-                    </ul>
-                </li>
-            </div>
+                {{ $bg := "bg-yellow-600" }}
+                {{ if eq .LastStatus "Healthy" }}
+                    {{ $bg = "bg-green-600" }}
+                {{ else}}
+                    {{ $bg = "bg-red-600" }}
+                {{end}}
+
+                <div class="m-2 p-2 w-100 text-xl border border-solid rounded-lg border-black {{ $bg }}">
+                    <li hx-get={{ .Id | printf "targets?id=%s" }} hx-target="#details">{{ .Name }}</li>
+                    <b>Last check: {{with .Healthchecks}} {{ with index . 0 }} {{ .Status }} at {{ .Timestamp}} {{end}} {{end}}</b>
+                </div>
             {{end}}
         </ul>
 
-        <div id="details"></div>
+        <div id="details" class="m-2 p-1"></div>
     </div>
 </body>
 

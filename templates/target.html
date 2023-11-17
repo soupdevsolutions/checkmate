@@ -1,3 +1,17 @@
 <div>
-    <h1>{{ .target.Name }}</h1>
+    <h1 class="text-lg">Details: {{ .target.Name }}</h1>
+    <br/>
+    <br/>
+
+    <h2 class="text-2xl">All checks:</h2>
+    <hr/>
+    <div class="m-2 p-1 text-base bg-slate-300 border border-solid rounded-lg border-black">
+        <ul>
+            {{range .target.Healthchecks}}
+            <li {{if eq .Status "Healthy"}} class="text-green-600" {{else}} class="text-red-600" {{end}}>
+                {{.Status }} | {{ .Timestamp }}
+            </li>
+            {{end}}
+        </ul>
+    </div>
 </div>
