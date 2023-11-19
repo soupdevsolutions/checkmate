@@ -45,8 +45,9 @@ func main() {
 
 	views := router.Group("/")
 	{
-		views.GET("/", getTargetsView)
-		views.GET("/targets", getTargetView)
+		views.GET("/", getIndexView)
+		views.GET("/targets", getTargetsView)
+		views.GET("/target", getTargetView)
 	}
 
 	api := router.Group("/api")
@@ -60,6 +61,15 @@ func main() {
 	}
 
 	router.Run("127.0.0.1:8080")
+}
+
+func getIndexView(c *gin.Context) {
+	tmpl := template.Must(template.ParseFiles("../templates/index.html"))
+	err := tmpl.Execute(c.Writer, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 }
 
 func getTargetsJson(c *gin.Context) {
@@ -86,7 +96,7 @@ func getTargetsView(c *gin.Context) {
 		targetsVms = append(targetsVms, viewmodels.NewTargetViewModel(&target))
 	}
 
-	tmpl := template.Must(template.ParseFiles("../templates/index.html"))
+	tmpl := template.Must(template.ParseFiles("../templates/targets_list.html"))
 
 	fmt.Printf("targets: %+v", targetsVms)
 

@@ -17,29 +17,11 @@
     </script>
 </head>
 
-<body class="mx-auto bg-white">
-    <nav class="bg-orange-300 mb-2 p-2">
+<body class="mx-auto bg-slate-100 font-mono">
+    <nav class="bg-orange-300 mb-2 p-2 pl-10">
         <h1 class="text-3xl"><a href="/">Soupdev Healthchecker</a></h1>
     </nav>
-    <div id="content" class="container mx-auto flex-auto bg-orange-300">
-        <ul class="flex-auto bg-slate-200 p-2 flex flex-initial flex-wrap">
-            {{range .targets}}
-                {{ $bg := "bg-yellow-600" }}
-                {{ if eq .LastStatus "Healthy" }}
-                    {{ $bg = "bg-green-600" }}
-                {{ else}}
-                    {{ $bg = "bg-red-600" }}
-                {{end}}
-
-                <div class="m-2 p-2 w-100 text-xl border border-solid rounded-lg border-black {{ $bg }}">
-                    <li hx-get={{ .Id | printf "targets?id=%s" }} hx-target="#details">{{ .Name }}</li>
-                    <b>Last check: {{with .Healthchecks}} {{ with index . 0 }} {{ .Status }} at {{ .Timestamp}} {{end}} {{end}}</b>
-                </div>
-            {{end}}
-        </ul>
-
-        <div id="details" class="m-2 p-1"></div>
-    </div>
+    <div id="content" class="container mx-auto flex-auto" hx-trigger="load" hx-get="targets"></div>
 </body>
 
 </html>
