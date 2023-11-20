@@ -6,15 +6,15 @@
         <h1 class="text-xl">Details: {{ .target.Name }}</h1>
         <ul class="border-4">
             {{range .target.Healthchecks}}
-            {{ $bc := "border-yellow-600" }}
-            {{ $bg := "bg-yellow-200" }}
-            {{ if eq .Status "Healthy" }}
-                {{ $bc = "border-green-600" }}
-                {{ $bg = "bg-green-200" }}
-            {{ else if eq .Status "Unhealthy"}}
-                {{ $bc = "border-red-600" }}
-                {{ $bg = "bg-red-200" }}
-            {{end}}
+                {{ $bc := "border-yellow-600" }}
+                {{ $bg := "bg-yellow-200" }}
+                {{ if eq .Status "Healthy" }}
+                    {{ $bc = "border-green-600" }}
+                    {{ $bg = "bg-green-200" }}
+                {{ else if eq .Status "Unhealthy"}}
+                    {{ $bc = "border-red-600" }}
+                    {{ $bg = "bg-red-200" }}
+                {{end}}
 
             <li class="border-t-2 {{ $bc }} {{ $bg }}">
                 Status: {{.Status }} | checked at {{ .Timestamp }}
