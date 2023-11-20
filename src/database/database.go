@@ -77,21 +77,8 @@ func (db *Database) Migrate() error {
 	return nil
 }
 
-func (db *Database) Seed(ctx context.Context) {
+func (db *Database) Seed(ctx context.Context, targets []healthcheck.HealthcheckTarget) {
 	log.Println("seeding database")
-	targets := []healthcheck.HealthcheckTarget{
-		{
-			Uri:          "http://www.google.com",
-			Name:         "Google",
-			Healthchecks: []healthcheck.Healthcheck{},
-		},
-		{
-			Uri:          "http://www.yahoo.com",
-			Name:         "Yahoo",
-			Healthchecks: []healthcheck.Healthcheck{},
-		},
-	}
-
 	targetsRepo := NewTargetsRepository(db)
 	for _, target := range targets {
 		targetsRepo.InsertTarget(ctx, &target)

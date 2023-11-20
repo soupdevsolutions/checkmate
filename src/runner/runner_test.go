@@ -2,6 +2,7 @@ package runner
 
 import (
 	"database/sql"
+	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"testing"
@@ -32,17 +33,21 @@ func SetupInMemoryDatabase() *database.Database {
 func TestStartStop(t *testing.T) {
 	db := SetupInMemoryDatabase()
 
-	runner := NewHealthcheckRunner(5, db, ok_checker)
+	mockConfig := config.RunnerConfig{
+		Period: 5,
+	}
+
+	runner := NewHealthcheckRunner(mockConfig, db, ok_checker)
 
 	runner.Start()
 	// The healthchecker should be running after starting it
 	if !runner.IsRunning() {
-		t.Error("Expected healthchecker to be running")
+		t.Error("expected healthchecker to be running")
 	}
 
 	runner.Stop()
 	// The healthchecker should not be running after stopping it
 	if runner.IsRunning() {
-		t.Error("Expected healthchecker to be stopped")
+		t.Error("expected healthchecker to be stopped")
 	}
 }

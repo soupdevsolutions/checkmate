@@ -13,8 +13,7 @@
 
         <div class="m-2 p-2 w-100 text-xl border border-solid border-2 rounded-lg {{ $bc }} {{ $bg }}">
             <li hx-trigger="click" hx-get={{ .Id | printf "target?id=%s" }} hx-target="#content">{{ .Name }}</li>
-            <b>Last check: {{if .Healthchecks}} {{ with index .Healthchecks 0 }} {{ .Status }} {{end}} {{else}} No
-                checks yet {{end}}</b>
+            <b>Last check: {{if .Healthchecks}} {{ with index .Healthchecks 0 }} {{ .Status }} {{end}} {{else}} N/A {{end}}</b>
         </div>
         {{end}}
     </ul>

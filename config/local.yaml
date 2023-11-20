@@ -4,3 +4,12 @@ database:
   name: "healthchecker"
   host: "localhost"
   port: 5432
+runner:
+  period: 5 # seconds
+  targets:
+    - name: Soup.dev
+      uri: "https://www.soup.dev"
+    - name: Github
+      uri: "https://www.github.com"
+    - name: Google
+      uri: "https://www.google.com"

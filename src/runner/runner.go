@@ -3,22 +3,23 @@ package runner
 import (
 	"context"
 	"log"
+	"soupdevsolutions/healthchecker/config"
 	"soupdevsolutions/healthchecker/database"
 	"soupdevsolutions/healthchecker/healthcheck"
 	"time"
 )
 
 type HealthcheckRunner struct {
-	Delay   int
+	Period  int
 	running bool
 	checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)
 	db      *database.Database
 	targets []healthcheck.HealthcheckTarget
 }
 
-func NewHealthcheckRunner(delay int, db *database.Database, checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)) HealthcheckRunner {
+func NewHealthcheckRunner(config config.RunnerConfig, db *database.Database, checker func(healthcheck.HealthcheckTarget) (healthcheck.Healthcheck, error)) HealthcheckRunner {
 	return HealthcheckRunner{
-		Delay:   delay,
+		Period:  config.Period,
 		running: false,
 		checker: checker,
 		db:      db,
@@ -44,7 +45,7 @@ func (c *HealthcheckRunner) run() {
 	healthchecksRepo := database.NewHealthchecksRepository(c.db)
 
 	for c.running {
-		time.Sleep(time.Duration(c.Delay) * time.Second)
+		time.Sleep(time.Duration(c.Period) * time.Second)
 
 		targets, err := targetsRepo.GetTargets(ctx)
 		if err != nil {

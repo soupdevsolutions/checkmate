@@ -19,8 +19,19 @@ func (db *DatabaseConfig) GetConnectionString() string {
 	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", db.Username, db.Password, db.Host, db.Port, db.Name)
 }
 
+type TargetConfig struct {
+	Name string `yaml:"name"`
+	Uri  string `yaml:"uri"`
+}
+
+type RunnerConfig struct {
+	Period  int            `yaml:"period"`
+	Targets []TargetConfig `yaml:"targets"`
+}
+
 type Config struct {
 	Database DatabaseConfig `yaml:"database"`
+	Runner   RunnerConfig   `yaml:"runner"`
 }
 
 func ReadConfig() (*Config, error) {
