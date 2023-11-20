@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"soupdevsolutions/healthchecker/config"
@@ -54,5 +55,5 @@ func main() {
 
 	log.Println("starting web server")
 	router := initRouter()
-	router.Run("127.0.0.1:8080")
+	router.Run(fmt.Sprintf("%s:%d", config.App.Host, config.App.Port))
 }

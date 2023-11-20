@@ -7,6 +7,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type AppConfig struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
 type DatabaseConfig struct {
 	Name     string `yaml:"name"`
 	Username string `yaml:"username"`
@@ -30,6 +35,7 @@ type RunnerConfig struct {
 }
 
 type Config struct {
+	App      AppConfig      `yaml:"app"`
 	Database DatabaseConfig `yaml:"database"`
 	Runner   RunnerConfig   `yaml:"runner"`
 }
