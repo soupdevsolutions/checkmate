@@ -1,15 +1,15 @@
-<div id="target_list">
+<div id="target_list" hx-trigger="every 10s" hx-get="targets">
     <ul class="flex-auto p-2 flex flex-initial flex-wrap">
         {{range .targets}}
-        {{ $bc := "border-yellow-600" }}
-        {{ $bg := "bg-yellow-200" }}
-        {{ if eq .LastStatus "Healthy" }}
-        {{ $bc = "border-green-600" }}
-        {{ $bg = "bg-green-200" }}
-        {{ else if eq .LastStatus "Unhealthy"}}
-        {{ $bc = "border-red-600" }}
-        {{ $bg = "bg-red-200" }}
-        {{end}}
+            {{ $bc := "border-yellow-600" }}
+            {{ $bg := "bg-yellow-200" }}
+            {{ if eq .LastStatus "Healthy" }}
+                {{ $bc = "border-green-600" }}
+                {{ $bg = "bg-green-200" }}
+            {{ else if eq .LastStatus "Unhealthy"}}
+                {{ $bc = "border-red-600" }}
+                {{ $bg = "bg-red-200" }}
+            {{end}}
 
         <div class="m-2 p-2 w-100 text-xl border border-solid border-2 rounded-lg {{ $bc }} {{ $bg }}">
             <li hx-trigger="click" hx-get={{ .Id | printf "target?id=%s" }} hx-target="#content">{{ .Name }}</li>
