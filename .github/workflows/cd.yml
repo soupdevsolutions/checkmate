@@ -22,19 +22,25 @@ jobs:
         export AWS_REGION="eu-west-1"
     
     - name: Setup Terraform
+      working-directory: ./infrastructure
       uses: hashicorp/setup-terraform@v1
         
     - name: Terraform Init
+      working-directory: ./infrastructure
       run: terraform init
       
     - name: Build
+      working-directory: ./src
       run: go build -v ./...
       
     - name: Test
+      working-directory: ./src
       run: go test -v ./...
 
     - name: Terraform Plan
+      working-directory: ./infrastructure
       run: terraform plan -no-color
 
     - name: Terraform Apply
+      working-directory: ./infrastructure
       run: terraform apply -auto-approve
