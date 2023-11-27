@@ -23,6 +23,6 @@ resource "aws_iam_policy" "healthchecker-be" {
 resource "aws_iam_policy_attachment" "healthchecker-be" {
   name       = "healthchecker-be"
   roles      = [aws_iam_role.healthchecker-be.name]
-  policy_arn = aws_iam_role_policy.healthchecker-be.arn
+  policy_arn = aws_iam_policy.healthchecker-be.arn
 }
 
