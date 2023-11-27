@@ -8,3 +8,9 @@ start-local:
     @./scripts/init_db.sh
     @echo "Starting web server..."
     @cd src && go run .
+
+deploy:
+    @echo "Deploying to AWS..."
+    cd ./infrastructure && terraform plan &&terraform apply -auto-approve
+    @echo "Applying migrations..."
+    @./scripts/migrate_db.sh > /dev/null

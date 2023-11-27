@@ -4,10 +4,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "4.4.0"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.0.2"
+    }
   }
 
   backend "s3" {
-    bucket = "serveless-payments-tf-state"
+    bucket = "healthchecker-tf-state"
     key    = "terraform.tfstate"
     region = "eu-west-1"
   }
@@ -21,6 +25,10 @@ provider "aws" {
   secret_key = var.AWS_SECRET_ACCESS_KEY
 }
 
-provider "stripe" {
-  api_token = var.STRIPE_API_KEY
+provider "docker" {
+  registry_auth {
+      address = data.aws_ecr_authorization_token.token.proxy_endpoint
+      username = data.aws_ecr_authorization_token.token.user_name
+      password  = data.aws_ecr_authorization_token.token.password
+    }
 }
