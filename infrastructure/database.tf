@@ -2,7 +2,7 @@ resource "aws_rds_cluster" "healthchecker" {
   cluster_identifier = "healthchecker"
   engine             = "aurora-postgresql"
   engine_mode        = "provisioned"
-  engine_version     = "16.1"
+  engine_version     = "15.2"
   database_name      = "healthchecker"
   master_username    = var.RDS_USERNAME
   master_password    = var.RDS_PASSWORD
