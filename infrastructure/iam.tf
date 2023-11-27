@@ -16,6 +16,13 @@ data "aws_iam_policy_document" "healthchecker-be-assume-policy" {
 }
 
 data "aws_iam_policy_document" "healthchecker-be" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "healthchecker-be" {
