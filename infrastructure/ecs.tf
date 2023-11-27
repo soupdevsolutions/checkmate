@@ -36,7 +36,7 @@ resource "aws_ecs_service" "healthchecker-be" {
   task_definition = aws_ecs_task_definition.healthchecker-be.arn
   desired_count   = 3
   iam_role        = aws_iam_role.healthchecker-be.arn
-  depends_on      = [aws_iam_role_policy.healthchecker-be]
+  depends_on      = [aws_iam_policy.healthchecker-be]
 
   ordered_placement_strategy {
     type  = "binpack"
