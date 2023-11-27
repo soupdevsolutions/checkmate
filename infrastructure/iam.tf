@@ -15,9 +15,8 @@ data "aws_iam_policy_document" "healthchecker-be" {
   }
 }
 
-resource "aws_iam_role_policy" "healthchecker-be" {
+resource "aws_iam_policy" "healthchecker-be" {
   name   = "healthchecker-be"
-  role   = aws_iam_role.healthchecker-be.id
   policy = data.aws_iam_policy_document.healthchecker-be.json
 }
 
