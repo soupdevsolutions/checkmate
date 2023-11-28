@@ -44,6 +44,12 @@ resource "aws_ecs_service" "healthchecker-be" {
     field = "cpu"
   }
 
+  load_balancer {
+    target_group_arn = aws_lb_target_group.healthchecker.arn
+    container_name   = "healthchecker"
+    container_port   = 80
+  }
+
   placement_constraints {
     type       = "memberOf"
     expression = "attribute:ecs.availability-zone in [eu-west-1a, eu-west-1b, eu-west-1c]"
