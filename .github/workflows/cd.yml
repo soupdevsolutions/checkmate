@@ -34,6 +34,16 @@ jobs:
       working-directory: ./src
       run: go test -v ./...
 
+    - name: Terraform Plan
+      env:
+        TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_AWS_REGION: "eu-west-1"
+        TF_VAR_RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+        TF_VAR_RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      working-directory: ./infrastructure
+      run: terraform plan -no-color
+
     - name: Docker Build
       working-directory: ./src
       env:
@@ -45,15 +55,6 @@ jobs:
         aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
         docker push $ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$REPO
 
-    - name: Terraform Plan
-      env:
-        TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        TF_VAR_AWS_REGION: "eu-west-1"
-        TF_VAR_RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
-        TF_VAR_RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-      working-directory: ./infrastructure
-      run: terraform plan -no-color
 
     - name: Terraform Apply
       env:
