@@ -27,6 +27,7 @@ resource "aws_ecs_task_definition" "healthchecker-be" {
 
   placement_constraints {
     type       = "memberOf"
+    expression = "attribute:ecs.availability-zone in [eu-west-1a, eu-west-1b, eu-west-1c]"
   }
 }
 
@@ -45,5 +46,6 @@ resource "aws_ecs_service" "healthchecker-be" {
 
   placement_constraints {
     type       = "memberOf"
+    expression = "attribute:ecs.availability-zone in [eu-west-1a, eu-west-1b, eu-west-1c]"
   }
 }
