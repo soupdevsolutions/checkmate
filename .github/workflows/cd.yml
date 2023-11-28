@@ -45,7 +45,7 @@ jobs:
       run: terraform plan -no-color
 
     - name: Docker Build
-      working-directory: ./src
+      working-directory: ./
       env:
         ACCOUNT: ${{ secrets.AWS_ACCESS_KEY_ID }}
         REGION: "eu-west-1"
