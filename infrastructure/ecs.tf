@@ -11,8 +11,8 @@ resource "aws_ecs_task_definition" "healthchecker-be" {
   family = "healthchecker-be"
   container_definitions = jsonencode([
     {
-      name      = docker_registry_image.healthchecker-be-handler.name
-      image     = docker_registry_image.healthchecker-be-handler.name
+      name      = "healthchecker-be"
+      image     = "healthchecker-be"
       cpu       = 10
       memory    = 512
       essential = true
