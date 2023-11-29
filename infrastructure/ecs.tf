@@ -46,7 +46,7 @@ resource "aws_ecs_service" "healthchecker-be" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.healthchecker.arn
-    container_name   = "healthchecker"
+    container_name   = "healthchecker-be"
     container_port   = 80
   }
 
