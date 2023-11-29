@@ -18,7 +18,10 @@ data "aws_iam_policy_document" "healthchecker-be-assume-policy" {
 data "aws_iam_policy_document" "healthchecker-be" {
   statement {
     actions = [
-      "s3:ListBucket",
+      "autoscaling:*",
+      "elasticloadbalancing:*",
+      "application-autoscaling:*",
+      "resource-groups:*"
     ]
 
     resources = ["*"]
