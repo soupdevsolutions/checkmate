@@ -38,7 +38,7 @@ resource "aws_lb_target_group" "healthchecker" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.healthchecker.id
 
-  depends_on = [aws_lb.aws_lb.healthchecker-be-lb]
+  depends_on = [aws_lb.healthchecker-be-lb]
 }
 
 resource "aws_lb_listener" "healthchecker" {
