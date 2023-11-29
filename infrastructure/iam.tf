@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "healthchecker-be-assume-policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+      identifiers = ["ec2.amazonaws.com", "ecs.amazonaws.com", "ecs-tasks.amazonaws.com"]
     }
   }
 }
