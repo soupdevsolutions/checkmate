@@ -12,6 +12,16 @@ resource "aws_subnet" "healthchecker" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_lb" "test" {
+  name               = "healthchecker-be-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.healthchecker_be.id]
+  subnets            = [aws_subnet.healthchecker.id]
+
+  enable_deletion_protection = true
+}
+
 resource "aws_lb_target_group" "healthchecker" {
   name     = "healthchecker"
   port     = 80
