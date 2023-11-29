@@ -9,6 +9,7 @@ resource "aws_vpc" "healthchecker" {
 resource "aws_subnet" "healthchecker" {
   count                   = var.AZ_COUNT
   vpc_id                  = aws_vpc.healthchecker.id
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
   cidr_block              = cidrsubnet(aws_vpc.healthchecker.cidr_block, 4, count.index)
   map_public_ip_on_launch = true
 }
