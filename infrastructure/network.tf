@@ -6,6 +6,14 @@ resource "aws_vpc" "healthchecker" {
   }
 }
 
+resource "aws_internet_gateway" "healthchecker-gw" {
+  vpc_id = aws_vpc.healthchecker.id
+
+  tags = {
+    Name = "healthchecker-gw"
+  }
+}
+
 resource "aws_subnet" "healthchecker" {
   count                   = var.AZ_COUNT
   vpc_id                  = aws_vpc.healthchecker.id
@@ -29,9 +37,11 @@ resource "aws_lb_target_group" "healthchecker" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.healthchecker.id
+
+  depends_on = [aws_lb.aws_lb.healthchecker-be-lb]
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "healthchecker" {
   load_balancer_arn = aws_lb.healthchecker-be-lb.arn
   port              = "80"
   protocol          = "HTTP"
