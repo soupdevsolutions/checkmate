@@ -1,6 +1,13 @@
 # macOS
 *.DS_Store
 
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform/
+*.hcl
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
