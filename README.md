@@ -18,14 +18,14 @@ git pull https://github.com/soupdevsolutions/healthchecker.git
 cd ./healthchecker
 ```
 
-With **just**:
+- With **just**:
 ```
 just start-local
 ```
 
 This will initialize the database, apply the migrations and start the web server. If you already have a database set up and/or don't want to run the migrations, do not use this command.
 
-Without **just** / with an already running database:
+- Without **just** / with an already running database:
 ```
 ./scripts/init_db.sh # only if you do not have a running database on port 5432
 ./scripts/migrate_db.sh # only if you have not applied the migrations to the running database
