@@ -1,6 +1,6 @@
 # checkmate
 
-[![CI](https://github.com/soupdevsolutions/healthchecker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soupdevsolutions/healthchecker/actions/workflows/ci.yml)
+[![CI](https://github.com/soupdevsolutions/checkmate/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/soupdevsolutions/checkmate/actions/workflows/ci.yml)
 
 ## Overview
 
@@ -14,8 +14,8 @@ To run the application locally, you will need **Docker** and **PostgreSQL** inst
 
 First, pull the repository and navigate to the new directory:
 ```
-git pull https://github.com/soupdevsolutions/healthchecker.git
-cd ./healthchecker
+git pull https://github.com/soupdevsolutions/checkmate.git
+cd ./checkmate
 ```
 
 - With **just**:
